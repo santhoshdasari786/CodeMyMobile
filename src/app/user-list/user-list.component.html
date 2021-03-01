@@ -1,0 +1,18 @@
+<div class="row">
+  <div class="col-xs-10">
+    <!-- <app-shopping-edit></app-shopping-edit> -->
+    <hr>
+    <button (click)="refresh()" >Refresh</button>
+    <h2 *ngIf="selectUser" >Friends List of {{selectUser.display_name}}</h2>
+    <ul class="list-group">
+      <a
+        class="list-group-item"
+        style="cursor: pointer"
+        *ngFor="let user of (users | async).users; let i = index"
+        (click)="LoadFriends(i,user)"
+      >
+        <img width="20" height="20" src="{{user.avatar}}" /> {{ user.display_name }} 
+      </a>
+    </ul>
+  </div>
+</div>
