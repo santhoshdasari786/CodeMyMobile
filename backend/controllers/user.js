@@ -54,7 +54,19 @@ exports.user_list = function (req, res) {
 
 exports.getFriendsList = function (req, res) {
 
-    connection.query(SqlString.format("select * from codemymobile.user where id in (select friend from codemymobile.friendship where user = ?);", [req.query.user]), function (err, rows) {
+    let q = SqlString.format(`select u1.* from codemymobile.friendship f1 
+    inner join codemymobile.friendship f2 on f1.friend = f2.user 
+    
+    left join codemymobile.user u1 on u1.id = f2.user
+     where f1.user = ? group by u1.id;`,[req.query.user])
+
+    // let q = SqlString.format(`select * from codemymobile.user u1 
+    // inner join codemymobile.friendship f1 on f1.friend =u1.id 
+    // where  f1.user = ? or f1.friend = ? and id != ?  group by id ;`,[req.query.user,req.query.user,req.query.user])
+
+    // let q = SqlString.format("select * from codemymobile.user where id in (select friend from codemymobile.friendship where user = ?);", [req.query.user])
+
+    connection.query(q, function (err, rows) {
         if (err) {
             return res.send({ success: false, msg: "Failed", error: err });
         }
@@ -65,10 +77,23 @@ exports.getFriendsList = function (req, res) {
 
 exports.getFriendsofFriendsList = function (req, res) {
 
-    connection.query(SqlString.format(`select u1.* from codemymobile.friendship f1 
+    // let q = SqlString.format(`select u1.* from codemymobile.friendship f1 
+    // inner join codemymobile.friendship f2 on f1.friend = f2.user 
+    // left join codemymobile.user u1 on u1.id = f2.friend
+    //  where f1.user = ? group by f2.friend;`, [req.query.user])
+
+    let q = SqlString.format(`select u1.* from codemymobile.friendship f1 
     inner join codemymobile.friendship f2 on f1.friend = f2.user 
-    left join codemymobile.user u1 on u1.id = f2.friend
-     where f1.user = ? group by f2.friend;`, [req.query.user]), function (err, rows) {
+    
+    left join codemymobile.user u1 on u1.id = f2.user
+     where f1.user = ? group by u1.id;`,[req.query.user])
+
+    // let q =SqlString.format(`select u1.* from codemymobile.friendship f1 
+    // inner join codemymobile.friendship f2 on f1.friend = f2.user 
+    // left join codemymobile.user u1 on u1.id = f2.friend
+    //  where f1.user = ? group by f2.friend;`, [req.query.user])
+
+    connection.query(q, function (err, rows) {
         if (err) {
             return res.send({ success: false, msg: "Failed", error: err });
         }
